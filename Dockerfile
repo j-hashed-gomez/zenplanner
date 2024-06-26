@@ -29,7 +29,7 @@ ENV PATH="/app/venv/bin:$PATH"
 COPY requirements.txt /app/
 
 # Instalar las dependencias de Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # Crear el directorio de plantillas
 RUN mkdir -p /app/zenplanner/templates
@@ -52,7 +52,7 @@ ARG DJANGO_SECRET_KEY
 ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
-RUN python manage.py migrate
+RUN /app/venv/bin/python manage.py migrate
 
 # Exponer el puerto 80
 EXPOSE 80
