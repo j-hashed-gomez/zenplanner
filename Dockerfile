@@ -38,6 +38,7 @@ RUN mkdir -p /app/zenplanner/templates
 
 # Copiar los archivos .py al directorio /app/zenplanner/
 COPY *.py /app/zenplanner/
+COPY manage.py /app/
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
 COPY templates/ /app/zenplanner/templates/ 
