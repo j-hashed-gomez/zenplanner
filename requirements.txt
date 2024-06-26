@@ -1,4 +1,4 @@
-Django>=3.2,<4.0
+Django>=4.0,<5.0
 mod_wsgi
 google-api-python-client
 google-auth
