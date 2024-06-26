@@ -4,7 +4,7 @@ FROM python:3.9-slim
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema
+# Instalar dependencias del sistema y mod_wsgi para Apache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
@@ -14,6 +14,7 @@ RUN apt-get update \
     sqlite3 \
     curl \
     bash \
+    libapache2-mod-wsgi-py3 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -30,9 +31,6 @@ COPY requirements.txt /app/
 # Instalar las dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Instalar mod_wsgi
-RUN pip install mod_wsgi
-
 # Crear el directorio de plantillas
 RUN mkdir -p /app/zenplanner/templates
 
@@ -41,13 +39,17 @@ COPY *.py /app/zenplanner/
 COPY manage.py /app/
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
-COPY templates/ /app/zenplanner/templates/ 
+COPY templates/ /app/zenplanner/templates/
 
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
+
+# Establecer la variable de entorno DJANGO_SECRET_KEY
+ARG DJANGO_SECRET_KEY
+ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
 RUN python manage.py migrate
