@@ -39,8 +39,8 @@ RUN mkdir -p /app/zenplanner/templates
 # Copiar los archivos .py al directorio /app/zenplanner/
 COPY *.py /app/zenplanner/
 
-# Copiar el contenido del directorio templates a /app/zenplanner/templates/
-COPY templates/ /app/zenplanner/templates/
+# Copiar el contenido del directorio templates a /app/zenplanner/templates/ 
+COPY ./templates/ /app/zenplanner/templates/
 
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
