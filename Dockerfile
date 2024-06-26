@@ -61,3 +61,4 @@ EXPOSE 80
 
 # Comando para ejecutar el servidor Apache en primer plano
 CMD ["apachectl", "-D", "FOREGROUND"]
+
