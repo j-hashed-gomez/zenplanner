@@ -47,7 +47,6 @@ jobs:
             echo "Stopping and removing existing container if it exists..."
             if [ "$(docker ps -q -f name=zenplanner)" ]; then
               docker stop zenplanner
-              docker rm zenplanner
             fi
             if [ "$(docker ps -a -q -f name=zenplanner)" ]; then
               docker rm zenplanner
