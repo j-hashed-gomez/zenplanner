@@ -29,8 +29,8 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}/my-image:latest
-          build-args: 
-            DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          build-args: |
+            DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
