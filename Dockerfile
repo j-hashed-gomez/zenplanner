@@ -3,7 +3,6 @@ FROM python:3.9-slim
 
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Instalar dependencias del sistema
 RUN apt-get update \
@@ -48,6 +47,10 @@ COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Habilitar mod_wsgi
 RUN mod_wsgi-express install-module > /etc/apache2/mods-available/wsgi.load
+
+# Establecer la variable de entorno DJANGO_SECRET_KEY
+ARG DJANGO_SECRET_KEY
+ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
 RUN python manage.py migrate
