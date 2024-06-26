@@ -44,10 +44,18 @@ jobs:
       - name: Stop and remove existing container
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
+            echo "Stopping and removing existing container if it exists..."
             if [ "$(docker ps -q -f name=zenplanner)" ]; then
               docker stop zenplanner
               docker rm zenplanner
             fi
+          EOF
+
+      - name: Verify no container is running
+        run: |
+          ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
+            echo "Verifying no container named zenplanner is running..."
+            docker ps -a
           EOF
 
       - name: Deploy new container
@@ -55,5 +63,13 @@ jobs:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
+            echo "Deploying new container..."
             docker run -d --name zenplanner -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' ghcr.io/${{ github.repository }}/my-image:latest
+          EOF
+
+      - name: Verify new container is running
+        run: |
+          ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
+            echo "Verifying new container is running..."
+            docker ps -a
           EOF
