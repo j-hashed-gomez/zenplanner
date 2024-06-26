@@ -35,7 +35,7 @@ RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 RUN mkdir -p /app/zenplanner/templates
 
 # Copiar los archivos del proyecto al directorio de trabajo
-COPY zenplanner /app/zenplanner/
+COPY *.py /app/zenplanner/
 COPY manage.py /app/
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
