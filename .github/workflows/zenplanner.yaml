@@ -47,8 +47,8 @@ jobs:
             echo "Stopping and removing existing container if it exists..."
             if [ "$(docker ps -q -f name=zenplanner)" ]; then
               docker stop zenplanner
-            fi
-            if [ "$(docker ps -a -q -f name=zenplanner)" ]; then
+              docker rm zenplanner
+            elif [ "$(docker ps -a -q -f name=zenplanner)" ]; then
               docker rm zenplanner
             fi
           EOF
@@ -75,5 +75,3 @@ jobs:
             echo "Verifying new container is running..."
             docker ps -a
           EOF
-
-          
