@@ -1,0 +1,50 @@
+name: Deploy to Docker
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}/my-image:latest
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Stop and remove existing container
+        run: |
+          ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
+            if [ "$(docker ps -q -f name=my-container)" ]; then
+              docker stop my-container
+              docker rm my-container
+            fi
+          EOF
+
+      - name: Deploy new container
+        run: |
+          ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
+            docker run -d --name my-container ghcr.io/${{ github.repository }}/my-image:latest
+          EOF
