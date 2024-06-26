@@ -55,5 +55,5 @@ jobs:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
-            docker run -d --name zenplanner -e DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY ghcr.io/${{ github.repository }}/my-image:latest
+            docker run -d --name zenplanner -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' ghcr.io/${{ github.repository }}/my-image:latest
           EOF
