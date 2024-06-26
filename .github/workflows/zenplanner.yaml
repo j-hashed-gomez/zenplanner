@@ -26,8 +26,11 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           tags: ghcr.io/${{ github.repository }}/my-image:latest
+          build-args: 
+            DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -37,14 +40,14 @@ jobs:
       - name: Stop and remove existing container
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
-            if [ "$(docker ps -q -f name=my-container)" ]; then
-              docker stop my-container
-              docker rm my-container
+            if [ "$(docker ps -q -f name=zenplanner)" ]; then
+              docker stop zenplanner
+              docker rm zenplanner
             fi
           EOF
 
       - name: Deploy new container
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
-            docker run -d --name my-container ghcr.io/${{ github.repository }}/my-image:latest
+            docker run -d --name zenplanner -e DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} ghcr.io/${{ github.repository }}/my-image:latest
           EOF
