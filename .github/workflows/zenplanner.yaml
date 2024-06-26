@@ -51,7 +51,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
             echo "Deploying new container..."
-            docker run -d --name zenplanner -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' ghcr.io/${{ github.repository }}/my-image:latest
+            docker run -d -p 80:80 --name zenplanner -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' ghcr.io/${{ github.repository }}/my-image:latest
           EOF
 
       - name: Verify new container is running
