@@ -49,6 +49,9 @@ jobs:
               docker stop zenplanner
               docker rm zenplanner
             fi
+            if [ "$(docker ps -a -q -f name=zenplanner)" ]; then
+              docker rm zenplanner
+            fi
           EOF
 
       - name: Verify no container is running
