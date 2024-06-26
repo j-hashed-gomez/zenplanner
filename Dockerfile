@@ -46,12 +46,8 @@ COPY templates/ /app/zenplanner/templates/
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
-# Habilitar mod_wsgi
-RUN mod_wsgi-express install-module > /etc/apache2/mods-available/wsgi.load
-
-# Establecer la variable de entorno DJANGO_SECRET_KEY
-ARG DJANGO_SECRET_KEY
-ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+# Habilitar mod_wsgi en Apache
+RUN a2enmod wsgi
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
 RUN python manage.py migrate
@@ -61,4 +57,3 @@ EXPOSE 80
 
 # Comando para ejecutar el servidor Apache en primer plano
 CMD ["apachectl", "-D", "FOREGROUND"]
-
