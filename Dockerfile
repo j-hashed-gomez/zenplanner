@@ -72,4 +72,3 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Comando para ejecutar el servidor Apache en primer plano
 CMD ["apachectl", "-D", "FOREGROUND"]
-
