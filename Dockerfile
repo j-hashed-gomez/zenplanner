@@ -46,6 +46,7 @@ RUN mkdir -p /app/config
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY *.py /app/zenplanner/
 COPY manage.py /app/
+COPY entrypoint.sh /app/
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
 COPY templates/ /app/zenplanner/templates/
@@ -59,24 +60,19 @@ COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
 
-# Establecer variables de entorno para Google OAuth y DB
-ARG GOOGLE_CLIENT_ID
-ARG GOOGLE_CLIENT_SECRET
-ARG GOOGLE_REDIRECT_URI
-
-ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-ENV GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
+# Configurar fstab
+RUN echo "tmpfs /app/config tmpfs defaults,size=100M 0 0" >> /etc/fstab
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
 RUN chown -R www-data:www-data /app
-
-# Configurar fstab
-RUN echo "tmpfs /app/config tmpfs defaults,size=100M 0 0" >> /etc/fstab
+RUN chmod +x /app/entrypoint.sh
 
 # Exponer el puerto 80
 EXPOSE 80
+
+# Usar el script de inicialización como punto de entrada
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Comando para ejecutar el servidor Apache en primer plano
 CMD ["apachectl", "-D", "FOREGROUND"]

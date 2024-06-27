@@ -75,11 +75,11 @@ WSGI_APPLICATION = 'zenplanner.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zenplanner',
-        'USER': 'zenplanner',
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': 'gj1048404-001.eu.clouddb.ovh.net',
-        'PORT': '35392',
+        'NAME': os.getenv('DB_NAME', 'zenplanner'),
+        'USER': os.getenv('DB_USER', 'zenplanner'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'your_actual_db_password'),
+        'HOST': os.getenv('DB_HOST', 'gj1048404-001.eu.clouddb.ovh.net'),
+        'PORT': os.getenv('DB_PORT', '35392'),
     }
 }
 
