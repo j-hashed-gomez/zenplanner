@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Login</title>
+    <title>User Info</title>
 </head>
 <body>
-    <h1>Welcome to the App</h1>
-    <a href="{% url 'google_login' %}">
-        <button>Login with Google</button>
-    </a>
+    <h1>User Info</h1>
+    <p>Name: {{ user_info.name }}</p>
+    <p>Email: {{ user_info.email }}</p>
 </body>
 </html>

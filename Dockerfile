@@ -51,6 +51,13 @@ RUN a2enmod wsgi
 
 # Establecer la variable de entorno DJANGO_SECRET_KEY
 ARG DJANGO_SECRET_KEY
+# Establecer variables de entorno para Google OAuth
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG GOOGLE_REDIRECT_URI
+ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+ENV GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
 ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado

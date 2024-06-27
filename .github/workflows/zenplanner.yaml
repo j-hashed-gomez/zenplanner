@@ -35,6 +35,9 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/my-image:latest
           build-args: |
             DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -48,10 +51,18 @@ jobs:
       - name: Deploy new container
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
             echo "Deploying new container..."
-            docker run -d -p 80:80 --name zenplanner -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' ghcr.io/${{ github.repository }}/my-image:latest
+            docker run -d -p 80:80 --name zenplanner \
+              -e DJANGO_SECRET_KEY='$DJANGO_SECRET_KEY' \
+              -e GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' \
+              -e GOOGLE_CLIENT_SECRET='$GOOGLE_CLIENT_SECRET' \
+              -e GOOGLE_REDIRECT_URI='$GOOGLE_REDIRECT_URI' \
+              ghcr.io/${{ github.repository }}/my-image:latest
           EOF
 
       - name: Verify new container is running
