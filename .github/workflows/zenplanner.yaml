@@ -39,17 +39,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Create Docker secrets
-        run: |
-          echo "${{ secrets.DB_HOST }}" | docker secret create db_host -
-          echo "${{ secrets.DB_PASSWORD }}" | docker secret create db_password -
-          echo "${{ secrets.DB_PORT }}" | docker secret create db_port -
-          echo "${{ secrets.DB_USER }}" | docker secret create db_user -
-          echo "${{ secrets.DJANGO_SECRET_KEY }}" | docker secret create django_secret_key -
-          echo "${{ secrets.GOOGLE_CLIENT_ID }}" | docker secret create google_client_id -
-          echo "${{ secrets.GOOGLE_CLIENT_SECRET }}" | docker secret create google_client_secret -
-          echo "${{ secrets.GOOGLE_REDIRECT_URI }}" | docker secret create google_redirect_uri -
-
       - name: Clean up Docker environment
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 'bash /root/limpia.sh'
@@ -58,17 +47,15 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
             echo "Deploying new container..."
-            docker service create \
-              --name zenplanner \
-              --secret db_host \
-              --secret db_password \
-              --secret db_port \
-              --secret db_user \
-              --secret django_secret_key \
-              --secret google_client_id \
-              --secret google_client_secret \
-              --secret google_redirect_uri \
-              -p 80:80 \
+            docker run -d -p 80:80 --name zenplanner \
+              -e DB_HOST="${{ secrets.DB_HOST }}" \
+              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              -e DB_PORT="${{ secrets.DB_PORT }}" \
+              -e DB_USER="${{ secrets.DB_USER }}" \
+              -e DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" \
+              -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+              -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              -e GOOGLE_REDIRECT_URI="${{ secrets.GOOGLE_REDIRECT_URI }}" \
               ghcr.io/${{ github.repository }}/my-image:latest
           EOF
 
@@ -76,5 +63,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
             echo "Verifying new container is running..."
-            docker service ls
+            docker ps -a
           EOF

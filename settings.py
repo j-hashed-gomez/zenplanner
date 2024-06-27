@@ -5,7 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Lectura de las variables de entorno
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your_default_secret_key')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
