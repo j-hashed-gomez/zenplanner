@@ -38,10 +38,6 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
-            DB_HOST=gj1048404-001.eu.clouddb.ovh.net
-            DB_PORT=35392
-            DB_USER=zenplanner
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -58,33 +54,17 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
-          DB_HOST: gj1048404-001.eu.clouddb.ovh.net
-          DB_PORT: 35392
-          DB_USER: zenplanner
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
             echo "Deploying new container..."
+            docker volume create zenplanner-config
             docker run -d -p 80:80 --name zenplanner \
               -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
               -e GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
               -e GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
               -e GOOGLE_REDIRECT_URI="$GOOGLE_REDIRECT_URI" \
-              -e DB_HOST="gj1048404-001.eu.clouddb.ovh.net" \
-              -e DB_PORT="35392" \
-              -e DB_USER="zenplanner" \
-              -e DB_PASSWORD="$DB_PASSWORD" \
+              -v zenplanner-config:/app/config \
               ghcr.io/${{ github.repository }}/my-image:latest
-
-            echo "Waiting for the database to be ready..."
-            while ! docker exec zenplanner /app/venv/bin/python manage.py showmigrations; do
-              echo "Database is not ready yet. Waiting..."
-              sleep 5
-            done
-
-            echo "Running migrations..."
-            docker exec zenplanner /app/venv/bin/python manage.py migrate
-            docker exec zenplanner /app/venv/bin/python manage.py collectstatic --noinput
           EOF
 
       - name: Verify new container is running

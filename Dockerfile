@@ -41,6 +41,7 @@ RUN /app/venv/bin/pip install mysqlclient
 RUN mkdir -p /app/zenplanner/templates
 RUN mkdir -p /app/static
 RUN mkdir -p /app/zenplanner/static
+RUN mkdir -p /app/config
 
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY *.py /app/zenplanner/
@@ -62,21 +63,17 @@ RUN a2enmod wsgi
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG GOOGLE_REDIRECT_URI
-ARG DB_HOST
-ARG DB_PORT
-ARG DB_USER
-ARG DB_PASSWORD
+
 ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
 ENV GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
-ENV DB_HOST=$DB_HOST
-ENV DB_PORT=$DB_PORT
-ENV DB_USER=$DB_USER
-ENV DB_PASSWORD=$DB_PASSWORD
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
 RUN chown -R www-data:www-data /app
+
+# Configurar fstab
+RUN echo "tmpfs /app/config tmpfs defaults,size=100M 0 0" >> /etc/fstab
 
 # Exponer el puerto 80
 EXPOSE 80
