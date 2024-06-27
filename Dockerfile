@@ -20,6 +20,7 @@ RUN apt-get update \
     python3-dev \
     musl-dev \
     pkg-config \
+    libssl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,11 +34,10 @@ ENV PATH="/app/venv/bin:$PATH"
 # Copiar los archivos de requerimientos
 COPY requirements.txt /app/
 
-# Instalar las dependencias de Python, incluyendo wheel y mysqlclient
+# Instalar las dependencias de Python, incluyendo una versión específica de mysqlclient
+RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
-RUN /app/venv/bin/pip install wheel
-RUN /app/venv/bin/pip install mysqlclient
-RUN /app/venv/bin/pip install mod_wsgi --use-pep517
+RUN /app/venv/bin/pip install mysqlclient==2.2.4
 
 # Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
