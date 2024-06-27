@@ -16,6 +16,9 @@ RUN apt-get update \
     bash \
     libapache2-mod-wsgi-py3 \
     default-libmysqlclient-dev \
+    gcc \
+    python3-dev \
+    musl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
