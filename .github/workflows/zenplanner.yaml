@@ -38,6 +38,10 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -54,7 +58,11 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
-        run: |
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << EOF
             echo "Deploying new container..."
             docker run -d -p 80:80 --name zenplanner \
@@ -62,6 +70,10 @@ jobs:
               -e GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' \
               -e GOOGLE_CLIENT_SECRET='$GOOGLE_CLIENT_SECRET' \
               -e GOOGLE_REDIRECT_URI='$GOOGLE_REDIRECT_URI' \
+              -e DB_HOST='$DB_HOST' \
+              -e DB_PORT='$DB_PORT' \
+              -e DB_USER='$DB_USER' \
+              -e DB_PASSWORD='$DB_PASSWORD' \
               ghcr.io/${{ github.repository }}/my-image:latest
           EOF
 
