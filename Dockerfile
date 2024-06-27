@@ -21,6 +21,8 @@ RUN apt-get update \
     musl-dev \
     pkg-config \
     libssl-dev \
+    libmariadb-dev-compat \
+    libmariadb-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,7 +39,7 @@ COPY requirements.txt /app/
 # Instalar las dependencias de Python, incluyendo una versión específica de mysqlclient
 RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
-RUN /app/venv/bin/pip install mysqlclient==2.2.4
+RUN /app/venv/bin/pip install --no-cache-dir mysqlclient==2.2.4
 
 # Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
