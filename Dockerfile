@@ -4,7 +4,7 @@ FROM python:3.9-slim
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema, mod_wsgi para Apache y mysqlclient
+# Instalar dependencias del sistema, mod_wsgi para Apache, y mysqlclient
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
@@ -19,6 +19,7 @@ RUN apt-get update \
     gcc \
     python3-dev \
     musl-dev \
+    pkg-config \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
