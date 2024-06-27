@@ -5,8 +5,8 @@ set -e
 export $(grep -v '^#' /app/config/config.cfg | xargs)
 
 # Ejecutar las tareas de inicialización
-echo "Running database migrations..."
-/app/venv/bin/python /app/manage.py migrate
+#echo "Running database migrations..."
+#/app/venv/bin/python /app/manage.py migrate
 
 echo "Collecting static files..."
 /app/venv/bin/python /app/manage.py collectstatic --noinput
