@@ -6,7 +6,7 @@ from django.urls import reverse
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI')
+GOOGLE_REDIRECT_URI = 'https://zenplanner.gomezmarin.es/callback'
 
 def index(request):
     return render(request, 'index.html')
