@@ -44,6 +44,10 @@ COPY templates/ /app/zenplanner/templates/
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
+# Establece los permisos adecuados para el directorio de trabajo y los archivos
+RUN chmod -R 755 /app
+RUN chown -R www-data:www-data /app
+
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
 
