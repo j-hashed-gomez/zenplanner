@@ -70,7 +70,12 @@ WSGI_APPLICATION = 'zenplanner.wsgi.application'
 
 # Configuración de archivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Cambiado a 'staticfiles' para evitar conflicto
+
+# Configuración de archivos estáticos adicionales
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Configuración de archivos de medios
 MEDIA_URL = '/media/'
@@ -98,8 +103,3 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-# Configuración de los archivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
