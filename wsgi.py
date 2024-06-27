@@ -1,13 +1,16 @@
 import os
 import sys
 
-from django.core.wsgi import get_wsgi_application
+# Ruta al entorno virtual
+venv_path = '/app/venv'
 
-# Añadir la ruta de tu proyecto al path
+# Añadir la ruta del entorno virtual al sys.path
+sys.path.append(venv_path + '/lib/python3.9/site-packages')
+
+# Añadir la ruta de tu proyecto al sys.path
 sys.path.append('/app')
 
-# Añadir la ruta al entorno virtual
-sys.path.append('/app/venv/lib/python3.9/site-packages')
+from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zenplanner.settings')
 
