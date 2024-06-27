@@ -38,9 +38,9 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_USER=${{ secrets.DB_USER }}
+            DB_HOST=gj1048404-001.eu.clouddb.ovh.net
+            DB_PORT=35392
+            DB_USER=zenplanner
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
       - name: Set up SSH
@@ -58,9 +58,9 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USER: ${{ secrets.DB_USER }}
+          DB_HOST: gj1048404-001.eu.clouddb.ovh.net
+          DB_PORT: 35392
+          DB_USER: zenplanner
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
@@ -70,9 +70,9 @@ jobs:
               -e GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
               -e GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
               -e GOOGLE_REDIRECT_URI="$GOOGLE_REDIRECT_URI" \
-              -e DB_HOST="$DB_HOST" \
-              -e DB_PORT="$DB_PORT" \
-              -e DB_USER="$DB_USER" \
+              -e DB_HOST="gj1048404-001.eu.clouddb.ovh.net" \
+              -e DB_PORT="35392" \
+              -e DB_USER="zenplanner" \
               -e DB_PASSWORD="$DB_PASSWORD" \
               ghcr.io/${{ github.repository }}/my-image:latest
 
