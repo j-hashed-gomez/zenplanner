@@ -4,7 +4,7 @@ FROM python:3.9-slim
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema y mod_wsgi para Apache
+# Instalar dependencias del sistema, mod_wsgi para Apache y mysqlclient
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
@@ -15,6 +15,7 @@ RUN apt-get update \
     curl \
     bash \
     libapache2-mod-wsgi-py3 \
+    default-libmysqlclient-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,8 +29,9 @@ ENV PATH="/app/venv/bin:$PATH"
 # Copiar los archivos de requerimientos
 COPY requirements.txt /app/
 
-# Instalar las dependencias de Python
+# Instalar las dependencias de Python, incluyendo mysqlclient
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN /app/venv/bin/pip install mysqlclient
 
 # Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
