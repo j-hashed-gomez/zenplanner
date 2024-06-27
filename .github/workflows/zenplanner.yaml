@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      secrets: read
 
     steps:
       - name: Checkout code
@@ -33,37 +34,42 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}/my-image:latest
-          build-args: |
-            DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Create Docker secrets
+        run: |
+          echo "${{ secrets.DB_HOST }}" | docker secret create db_host -
+          echo "${{ secrets.DB_PASSWORD }}" | docker secret create db_password -
+          echo "${{ secrets.DB_PORT }}" | docker secret create db_port -
+          echo "${{ secrets.DB_USER }}" | docker secret create db_user -
+          echo "${{ secrets.DJANGO_SECRET_KEY }}" | docker secret create django_secret_key -
+          echo "${{ secrets.GOOGLE_CLIENT_ID }}" | docker secret create google_client_id -
+          echo "${{ secrets.GOOGLE_CLIENT_SECRET }}" | docker secret create google_client_secret -
+          echo "${{ secrets.GOOGLE_REDIRECT_URI }}" | docker secret create google_redirect_uri -
+
       - name: Clean up Docker environment
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 'bash /root/limpia.sh'
 
       - name: Deploy new container
-        env:
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
             echo "Deploying new container..."
-            docker volume create zenplanner-config
-            docker run -d -p 80:80 --name zenplanner \
-              -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
-              -e GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
-              -e GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
-              -e GOOGLE_REDIRECT_URI="$GOOGLE_REDIRECT_URI" \
-              -v zenplanner-config:/app/config \
+            docker service create \
+              --name zenplanner \
+              --secret db_host \
+              --secret db_password \
+              --secret db_port \
+              --secret db_user \
+              --secret django_secret_key \
+              --secret google_client_id \
+              --secret google_client_secret \
+              --secret google_redirect_uri \
+              -p 80:80 \
               ghcr.io/${{ github.repository }}/my-image:latest
           EOF
 
@@ -71,5 +77,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@51.210.102.229 << 'EOF'
             echo "Verifying new container is running..."
-            docker ps -a
+            docker service ls
           EOF

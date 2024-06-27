@@ -41,7 +41,6 @@ RUN /app/venv/bin/pip install mysqlclient
 RUN mkdir -p /app/zenplanner/templates
 RUN mkdir -p /app/static
 RUN mkdir -p /app/zenplanner/static
-RUN mkdir -p /app/config
 
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY *.py /app/zenplanner/
@@ -59,9 +58,6 @@ COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
-
-# Configurar fstab
-RUN echo "tmpfs /app/config tmpfs defaults,size=100M 0 0" >> /etc/fstab
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
