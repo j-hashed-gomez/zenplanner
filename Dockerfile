@@ -74,10 +74,6 @@ ENV DB_PORT=$DB_PORT
 ENV DB_USER=$DB_USER
 ENV DB_PASSWORD=$DB_PASSWORD
 
-# Descargar y agregar el script wait-for-it
-ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
-
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
 RUN chown -R www-data:www-data /app

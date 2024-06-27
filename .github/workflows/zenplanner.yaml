@@ -75,8 +75,15 @@ jobs:
               -e DB_USER="$DB_USER" \
               -e DB_PASSWORD="$DB_PASSWORD" \
               ghcr.io/${{ github.repository }}/my-image:latest
+
+            echo "Waiting for the database to be ready..."
+            while ! docker exec zenplanner /app/venv/bin/python manage.py showmigrations; do
+              echo "Database is not ready yet. Waiting..."
+              sleep 5
+            done
+
             echo "Running migrations..."
-            docker exec zenplanner /wait-for-it.sh "$DB_HOST:$DB_PORT" --strict --timeout=300 -- /app/venv/bin/python manage.py migrate
+            docker exec zenplanner /app/venv/bin/python manage.py migrate
             docker exec zenplanner /app/venv/bin/python manage.py collectstatic --noinput
           EOF
 
