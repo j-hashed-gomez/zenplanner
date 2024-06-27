@@ -31,8 +31,10 @@ COPY requirements.txt /app/
 # Instalar las dependencias de Python
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 
-# Crear el directorio de plantillas
+# Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
+RUN mkdir -p /app/static
+RUN mkdir -p /app/zenplanner/static
 
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY *.py /app/zenplanner/
@@ -44,10 +46,6 @@ COPY templates/ /app/zenplanner/templates/
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
-# Establece los permisos adecuados para el directorio de trabajo y los archivos
-RUN chmod -R 755 /app
-RUN chown -R www-data:www-data /app
-
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
 
@@ -57,6 +55,11 @@ ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
 # Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
 RUN /app/venv/bin/python manage.py migrate
+RUN /app/venv/bin/python manage.py collectstatic --noinput
+
+# Establecer los permisos adecuados para el directorio de trabajo y los archivos
+RUN chmod -R 755 /app
+RUN chown -R www-data:www-data /app
 
 # Exponer el puerto 80
 EXPOSE 80
