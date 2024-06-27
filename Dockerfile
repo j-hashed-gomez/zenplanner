@@ -4,17 +4,15 @@ FROM python:3.9-slim
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema, mod_wsgi para Apache, y mysqlclient
+# Instalar dependencias del sistema y mysqlclient
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    apache2 \
-    apache2-dev \
+    nginx \
     sqlite3 \
     curl \
     bash \
-    libapache2-mod-wsgi-py3 \
     default-libmysqlclient-dev \
     gcc \
     python3-dev \
@@ -36,10 +34,10 @@ ENV PATH="/app/venv/bin:$PATH"
 # Copiar los archivos de requerimientos
 COPY requirements.txt /app/
 
-# Instalar las dependencias de Python, incluyendo una versión específica de mysqlclient
+# Instalar las dependencias de Python, incluyendo mysqlclient y gunicorn
 RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
-RUN /app/venv/bin/pip install --no-cache-dir mysqlclient==2.2.4
+RUN /app/venv/bin/pip install --no-cache-dir mysqlclient==2.2.4 gunicorn
 
 # Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
@@ -57,11 +55,8 @@ COPY templates/ /app/zenplanner/templates/
 # Copiar el contenido del directorio static a /app/static/
 COPY static/ /app/static/
 
-# Copiar la configuración de Apache
-COPY mysite.conf /etc/apache2/sites-available/000-default.conf
-
-# Habilitar mod_wsgi en Apache
-RUN a2enmod wsgi
+# Copiar la configuración de Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
@@ -74,5 +69,5 @@ EXPOSE 80
 # Usar el script de inicialización como punto de entrada
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Comando para ejecutar el servidor Apache en primer plano
-CMD ["apachectl", "-D", "FOREGROUND"]
+# Comando para ejecutar el servidor Gunicorn en primer plano
+CMD ["gunicorn", "--workers", "3", "--bind", "unix:/app/zenplanner.sock", "zenplanner.wsgi:application"]
