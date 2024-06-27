@@ -43,15 +43,16 @@ COPY manage.py /app/
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
 COPY templates/ /app/zenplanner/templates/
 
+# Copiar el contenido del directorio static a /app/static/
+COPY static/ /app/static/
+
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Habilitar mod_wsgi en Apache
 RUN a2enmod wsgi
 
-# Establecer la variable de entorno DJANGO_SECRET_KEY
-ARG DJANGO_SECRET_KEY
-# Establecer variables de entorno para Google OAuth
+# Establecer variables de entorno para Google OAuth y DB
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG GOOGLE_REDIRECT_URI
@@ -59,10 +60,9 @@ ARG DB_HOST
 ARG DB_PORT
 ARG DB_USER
 ARG DB_PASSWORD
-ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-ENV GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
-ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+ENV GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
 ENV DB_HOST=$DB_HOST
 ENV DB_PORT=$DB_PORT
 ENV DB_USER=$DB_USER
@@ -71,10 +71,6 @@ ENV DB_PASSWORD=$DB_PASSWORD
 # Descargar y agregar el script wait-for-it
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
-
-# Ejecutar migraciones y recolectar archivos estáticos
-RUN /wait-for-it.sh $DB_HOST:$DB_PORT -- /app/venv/bin/python manage.py migrate
-RUN /app/venv/bin/python manage.py collectstatic --noinput
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app

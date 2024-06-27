@@ -75,6 +75,9 @@ jobs:
               -e DB_USER='$DB_USER' \
               -e DB_PASSWORD='$DB_PASSWORD' \
               ghcr.io/${{ github.repository }}/my-image:latest
+            echo "Running migrations..."
+            docker exec zenplanner /wait-for-it.sh $DB_HOST:$DB_PORT -- /app/venv/bin/python manage.py migrate
+            docker exec zenplanner /app/venv/bin/python manage.py collectstatic --noinput
           EOF
 
       - name: Verify new container is running
