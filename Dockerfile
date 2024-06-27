@@ -33,9 +33,11 @@ ENV PATH="/app/venv/bin:$PATH"
 # Copiar los archivos de requerimientos
 COPY requirements.txt /app/
 
-# Instalar las dependencias de Python, incluyendo mysqlclient
+# Instalar las dependencias de Python, incluyendo wheel y mysqlclient
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN /app/venv/bin/pip install wheel
 RUN /app/venv/bin/pip install mysqlclient
+RUN /app/venv/bin/pip install mod_wsgi --use-pep517
 
 # Crear los directorios necesarios para el proyecto
 RUN mkdir -p /app/zenplanner/templates
