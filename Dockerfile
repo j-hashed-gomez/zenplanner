@@ -68,8 +68,12 @@ ENV DB_PORT=$DB_PORT
 ENV DB_USER=$DB_USER
 ENV DB_PASSWORD=$DB_PASSWORD
 
-# Migrar la base de datos para asegurarse de que SQLite está correctamente inicializado
-RUN /app/venv/bin/python manage.py migrate
+# Descargar y agregar el script wait-for-it
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Ejecutar migraciones y recolectar archivos estáticos
+RUN /wait-for-it.sh $DB_HOST:$DB_PORT -- /app/venv/bin/python manage.py migrate
 RUN /app/venv/bin/python manage.py collectstatic --noinput
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
