@@ -56,6 +56,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'path.to.custom_auth_backend.CustomAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
