@@ -58,6 +58,9 @@ COPY settings.py /app/zenplanner/
 COPY views.py /app/zenplanner/
 COPY custom_auth_backend.py /app/zenplanner/accounts/
 COPY entrypoint.sh /app/
+COPY __init__.py /app/zenplanner/
+COPY __init__.py /app/zenplanner/accounts/
+
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
 COPY templates/ /app/zenplanner/templates/
