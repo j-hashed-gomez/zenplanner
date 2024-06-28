@@ -4,7 +4,7 @@ import logging
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.db import connections
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest
 
@@ -86,18 +86,20 @@ def google_callback(request):
     # Autenticar al usuario y crear una sesión
     user, created = User.objects.get_or_create(username=email, defaults={'first_name': realname})
     if created:
+        logger.info(f"Created new user: {email}")
         user.set_unusable_password()
         user.save()
 
+    logger.debug(f"Authenticating user: {email}")
     user = authenticate(request, username=email)
     if user is not None:
         login(request, user)
         response = render(request, 'user_info.html', {'user_info': {'name': realname, 'email': email}})
         response.set_cookie('sessionid', request.session.session_key, httponly=True, secure=True)
-        logger.info("User authenticated and session created")
+        logger.info(f"User authenticated and session created: {email}")
         return response
     else:
-        logger.error("Authentication failed")
+        logger.error(f"Authentication failed for user: {email}")
         return HttpResponse("Authentication failed", status=401)
 
 def logout_view(request):

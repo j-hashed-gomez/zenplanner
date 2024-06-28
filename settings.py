@@ -55,6 +55,11 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 # Aplicación WSGI
 WSGI_APPLICATION = 'zenplanner.wsgi.application'
 
