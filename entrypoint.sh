@@ -1,26 +1,17 @@
 #!/bin/bash
-set -e
 
-# Activar el entorno virtual
-source /app/venv/bin/activate
+# Migraciones de Django
+/app/venv/bin/python /app/manage.py migrate --noinput
 
-# Ejecutar las tareas de inicialización
-echo "Running database migrations..."
-if python /app/manage.py migrate; then
-  echo "Database migrations completed successfully."
-else
-  echo "Database migrations failed. Continuing with the startup..."
-fi
+# Recoger archivos estáticos
+/app/venv/bin/python /app/manage.py collectstatic --noinput
 
-echo "Collecting static files..."
-if python /app/manage.py collectstatic --noinput; then
-  echo "Static files collected successfully."
-else
-  echo "Collecting static files failed. Continuing with the startup..."
-fi
+# Crear directorio para los logs
+mkdir -p /var/log/nginx
+mkdir -p /app/logs
 
-# Ejecutar Nginx en segundo plano
+# Iniciar Nginx en segundo plano
 nginx
 
-# Ejecutar Gunicorn en primer plano
+# Iniciar Gunicorn
 exec "$@"

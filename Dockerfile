@@ -39,10 +39,11 @@ RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 RUN /app/venv/bin/pip install --no-cache-dir mysqlclient==2.2.4 gunicorn
 
-# Crear los directorios necesarios para el proyecto
+# Crear los directorios necesarios para el proyecto y logs
 RUN mkdir -p /app/zenplanner/templates
 RUN mkdir -p /app/static
 RUN mkdir -p /app/zenplanner/static
+RUN mkdir -p /app/logs
 
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY *.py /app/zenplanner/
