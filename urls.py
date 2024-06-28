@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import index, google_login, google_callback
+from . import views
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('google-login/', google_login, name='google_login'),
-    path('callback/', google_callback, name='google_callback'),  # Actualiza la ruta del callback
+    path('', views.index, name='index'),
+    path('google-login/', views.google_login, name='google_login'),
+    path('callback/', views.google_callback, name='google_callback'),
+    path('logout/', views.logout_view, name='logout'),
 ]

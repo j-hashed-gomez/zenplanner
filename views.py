@@ -4,6 +4,9 @@ from django.shortcuts import redirect, render
 from django.conf import settings
 from django.utils import timezone
 from django.db import connections
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
@@ -53,17 +56,30 @@ def google_callback(request):
                 "UPDATE accounts SET lastlogin = %s WHERE email = %s",
                 [current_time, email]
             )
+            user_id = row[0]
         else:
             # El usuario no existe, insertar nuevo registro
             cursor.execute(
                 "INSERT INTO accounts (email, realname, registered, lastlogin) VALUES (%s, %s, %s, %s)",
                 [email, realname, current_time, current_time]
             )
+            user_id = cursor.lastrowid
 
-    context = {
-        'user_info': {
-            'name': realname,
-            'email': email
-        }
-    }
-    return render(request, 'user_info.html', context)
+    # Autenticar al usuario y crear una sesión
+    user, created = User.objects.get_or_create(username=email, defaults={'first_name': realname})
+    if created:
+        user.set_unusable_password()
+        user.save()
+
+    user = authenticate(request, username=email)
+    if user is not None:
+        login(request, user)
+        response = render(request, 'user_info.html', {'user_info': {'name': realname, 'email': email}})
+        response.set_cookie('sessionid', request.session.session_key, httponly=True, secure=True)
+        return response
+    else:
+        return HttpResponse("Authentication failed", status=401)
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
