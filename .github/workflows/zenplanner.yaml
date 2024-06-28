@@ -49,6 +49,7 @@ jobs:
             echo "Deploying new container..."
             docker run -d -p 80:80 --name zenplanner \
               -e DB_HOST="${{ secrets.DB_HOST }}" \
+              -e DB_NAME="${{ secrets.DB_NAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               -e DB_PORT="${{ secrets.DB_PORT }}" \
               -e DB_USER="${{ secrets.DB_USER }}" \
