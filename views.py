@@ -87,11 +87,11 @@ def google_callback(request):
     user, created = User.objects.get_or_create(username=email, defaults={'first_name': realname})
     if created:
         logger.info(f"Created new user: {email}")
-        user.set_unusable_password()
+        user.set_password('oauth_password')  # Establecer una contraseña fija
         user.save()
 
     logger.debug(f"Authenticating user: {email}")
-    user = authenticate(request, username=email)
+    user = authenticate(request, username=email, password='oauth_password')
     if user is not None:
         login(request, user)
         response = render(request, 'user_info.html', {'user_info': {'name': realname, 'email': email}})
