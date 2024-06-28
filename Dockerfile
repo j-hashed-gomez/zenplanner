@@ -1,5 +1,5 @@
-# Usar una imagen base ligera de Python
-FROM python:3.9-slim
+# Usar una imagen base ligera de Python 3.10
+FROM python:3.10-slim
 
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
@@ -26,6 +26,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalar mod_wsgi
+RUN apt-get install -y libapache2-mod-wsgi-py3
+RUN a2enmod wsgi
+
 # Crear un directorio de trabajo
 WORKDIR /app
 
@@ -36,10 +40,10 @@ ENV PATH="/app/venv/bin:$PATH"
 # Copiar los archivos de requerimientos
 COPY requirements.txt /app/
 
-# Instalar las dependencias de Python, incluyendo mysqlclient y mod_wsgi
+# Instalar las dependencias de Python
 RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
-RUN /app/venv/bin/pip install --no-cache-dir mysqlclient==2.2.4 mod_wsgi
+RUN /app/venv/bin/pip install --no-cache-dir mysqlclient mod_wsgi
 
 # Crear los directorios necesarios para el proyecto y logs
 RUN mkdir -p /app/zenplanner/templates
