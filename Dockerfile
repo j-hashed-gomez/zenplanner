@@ -9,7 +9,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    nginx \
     sqlite3 \
     curl \
     bash \
@@ -46,29 +45,33 @@ RUN /app/venv/bin/mod_wsgi-express install-module | tee /etc/apache2/mods-availa
 RUN a2enmod wsgi
 
 # Crear los directorios necesarios para el proyecto y logs
-RUN mkdir -p /app/zenplanner/templates
-RUN mkdir -p /app/static
-RUN mkdir -p /app/zenplanner/static
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/zenplanner/accounts \
+    && mkdir -p /app/zenplanner/templates \
+    && mkdir -p /app/zenplanner/static \
+    && mkdir -p /app/logs
 
 # Copiar los archivos del proyecto al directorio de trabajo
-COPY *.py /app/zenplanner/
 COPY manage.py /app/
+COPY wsgi.py /app/zenplanner/
+COPY urls.py /app/zenplanner/
+COPY settings.py /app/zenplanner/
+COPY views.py /app/zenplanner/
+COPY custom_auth_backend.py /app/zenplanner/accounts/
 COPY entrypoint.sh /app/
 
 # Copiar el contenido del directorio templates a /app/zenplanner/templates/
 COPY templates/ /app/zenplanner/templates/
 
-# Copiar el contenido del directorio static a /app/static/
+# Copiar el contenido del directorio static a /app/zenplanner/static/
 COPY static/ /app/static/
 
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
-RUN chmod -R 755 /app
-RUN chown -R www-data:www-data /app
-RUN chmod +x /app/entrypoint.sh
+RUN chmod -R 755 /app \
+    && chown -R www-data:www-data /app \
+    && chmod +x /app/entrypoint.sh
 
 # Exponer el puerto 80
 EXPOSE 80
@@ -78,4 +81,3 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Comando para ejecutar Apache en primer plano
 CMD ["apache2-foreground"]
-
