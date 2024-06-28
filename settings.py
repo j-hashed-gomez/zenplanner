@@ -56,9 +56,10 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.custom_auth_backend.OAuthBackend',  # Backend de autenticación personalizado
+    'zenplanner.accounts.custom_auth_backend.OAuthBackend',  # Ruta correcta al backend
     'django.contrib.auth.backends.ModelBackend',
 ]
+
 
 
 # Aplicación WSGI
