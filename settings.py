@@ -36,7 +36,7 @@ MIDDLEWARE = [
 ]
 
 # URL de enrutamiento principal
-ROOT_URLCONF = 'myproject.urls'
+ROOT_URLCONF = 'zenplanner.urls'
 
 # Configuración de plantillas
 TEMPLATES = [
@@ -56,7 +56,7 @@ TEMPLATES = [
 ]
 
 # Aplicación WSGI
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'zenplanner.wsgi.application'
 
 # Configuración de la base de datos
 DATABASES = {
