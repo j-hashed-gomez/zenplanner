@@ -11,25 +11,29 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
 # Hosts permitidos
-ALLOWED_HOSTS = ['zenplanner.gomezmarin.es', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['zenplanner.gomezmarin.es', 'localhost', '127.0.0.1', '51.210.102.229']
 
+# Aplicaciones instaladas
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Agrega tus aplicaciones personalizadas aquí
+]
+
+# Middleware
 MIDDLEWARE = [
-    # Otros middleware...
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-INSTALLED_APPS = [
-    # Otros apps...
-    'django.contrib.sessions',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.messages',
-]
-
 
 # URL de enrutamiento principal
 ROOT_URLCONF = 'zenplanner.urls'
