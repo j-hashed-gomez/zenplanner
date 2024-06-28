@@ -10,5 +10,8 @@
 mkdir -p /var/log/apache2
 mkdir -p /app/logs
 
+# Ajustar permisos para el directorio de logs
+chown -R www-data:www-data /app/logs
+
 # Iniciar Apache en primer plano
 apache2ctl -D FOREGROUND
