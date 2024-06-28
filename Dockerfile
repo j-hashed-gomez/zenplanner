@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema, Apache y mod_wsgi
+# Instalar dependencias del sistema, Apache y otras herramientas necesarias
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
@@ -26,10 +26,6 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar mod_wsgi
-RUN apt-get install -y libapache2-mod-wsgi-py3
-RUN a2enmod wsgi
-
 # Crear un directorio de trabajo
 WORKDIR /app
 
@@ -43,7 +39,11 @@ COPY requirements.txt /app/
 # Instalar las dependencias de Python
 RUN /app/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
-RUN /app/venv/bin/pip install --no-cache-dir mysqlclient mod_wsgi
+
+# Instalar mod_wsgi usando pip
+RUN /app/venv/bin/pip install mod_wsgi
+RUN /app/venv/bin/mod_wsgi-express install-module | tee /etc/apache2/mods-available/wsgi.load
+RUN a2enmod wsgi
 
 # Crear los directorios necesarios para el proyecto y logs
 RUN mkdir -p /app/zenplanner/templates
