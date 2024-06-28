@@ -59,7 +59,7 @@ COPY templates/ /app/zenplanner/templates/
 COPY static/ /app/static/
 
 # Copiar la configuración de Apache
-COPY apache.conf /etc/apache2/sites-available/000-default.conf
+COPY mysite.conf /etc/apache2/sites-available/000-default.conf
 
 # Establecer los permisos adecuados para el directorio de trabajo y los archivos
 RUN chmod -R 755 /app
