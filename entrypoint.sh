@@ -13,5 +13,5 @@ mkdir -p /app/logs
 # Iniciar Nginx en segundo plano
 nginx
 
-# Iniciar Gunicorn
-exec "$@"
+# Iniciar Gunicorn con logging
+exec gunicorn --workers 3 --bind unix:/app/zenplanner.sock zenplanner.wsgi:application --access-logfile /app/logs/gunicorn_access.log --error-logfile /app/logs/gunicorn_error.log --log-level debug

@@ -66,9 +66,10 @@ RUN chmod +x /app/entrypoint.sh
 
 # Exponer el puerto 80
 EXPOSE 80
+EXPOSE 443
 
 # Usar el script de inicialización como punto de entrada
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Comando para ejecutar el servidor Gunicorn en primer plano
-CMD ["gunicorn", "--workers", "3", "--bind", "unix:/app/zenplanner.sock", "zenplanner.wsgi:application"]
+# Comando para ejecutar el servidor Gunicorn en primer plano con logging
+CMD ["gunicorn", "--workers", "3", "--bind", "unix:/app/zenplanner.sock", "zenplanner.wsgi:application", "--access-logfile", "/app/logs/gunicorn_access.log", "--error-logfile", "/app/logs/gunicorn_error.log", "--log-level", "debug"]
