@@ -7,11 +7,8 @@
 /app/venv/bin/python /app/manage.py collectstatic --noinput
 
 # Crear directorio para los logs
-mkdir -p /var/log/nginx
+mkdir -p /var/log/apache2
 mkdir -p /app/logs
 
-# Iniciar Nginx en segundo plano
-nginx
-
-# Iniciar Gunicorn con logging
-exec gunicorn --workers 3 --bind unix:/app/zenplanner.sock zenplanner.wsgi:application --access-logfile /app/logs/gunicorn_access.log --error-logfile /app/logs/gunicorn_error.log --log-level debug
+# Iniciar Apache en primer plano
+apache2ctl -D FOREGROUND
