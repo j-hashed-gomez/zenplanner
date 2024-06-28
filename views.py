@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db import connections
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
@@ -25,7 +25,7 @@ def google_login(request):
 def google_callback(request):
     code = request.GET.get('code')
     if not code:
-        return HttpResponse("Error: Missing code parameter", status=400)
+        return HttpResponseBadRequest("Error: Missing code parameter")
 
     token_url = "https://oauth2.googleapis.com/token"
     token_data = {
