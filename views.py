@@ -7,6 +7,7 @@ from django.db import connections
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from .models import UserInfo  # Asegúrate de tener este modelo definido
 
 logger = logging.getLogger(__name__)
 
@@ -57,11 +58,10 @@ def google_callback(request):
     email = userinfo_json.get('email')
     realname = userinfo_json.get('name')
 
-    # Authenticate and create session
     user, created = User.objects.get_or_create(username=email, defaults={'first_name': realname})
     if created:
         logger.info(f"Created new user: {email}")
-        user.set_password('oauth_password')  # Set a fixed password
+        user.set_password('oauth_password')
         user.save()
 
     logger.debug(f"Authenticating user: {email}")
@@ -79,6 +79,16 @@ def google_callback(request):
 def logout_view(request):
     logout(request)
     return redirect('index')
+
+def get_reserved_slots(request):
+    if request.method == 'GET':
+        selected_date = request.GET.get('date')
+        if selected_date:
+            reserved_slots = UserInfo.objects.filter(timestamp__startswith=selected_date).values_list('timestamp', flat=True)
+            return JsonResponse({'reserved_slots': list(reserved_slots)})
+        else:
+            return JsonResponse({'error': 'Fecha no especificada'}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 def reserve_slot(request):
     if request.method == 'POST':

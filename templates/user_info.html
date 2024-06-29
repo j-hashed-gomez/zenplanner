@@ -36,6 +36,12 @@
         .time-slot:last-child {
             border-bottom: none;
         }
+        .time-slot.reserved {
+            background-color: red;
+            color: white;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -60,17 +66,31 @@
 
             $('#daterange').on('apply.daterangepicker', function(ev, picker) {
                 $('#selected-month').text('Mes seleccionado: ' + picker.startDate.format('MMMM YYYY'));
-                generateTimeSlots(picker.startDate.format('YYYY-MM-DD'));
+                var selectedDate = picker.startDate.format('YYYYMMDD');
+                fetchReservedSlots(selectedDate);
             });
 
-            function generateTimeSlots(selectedDate) {
-                var startTime = moment(selectedDate + ' 00:00', 'YYYY-MM-DD HH:mm');
-                var endTime = moment(selectedDate + ' 23:30', 'YYYY-MM-DD HH:mm');
+            function fetchReservedSlots(date) {
+                $.ajax({
+                    url: '/api/get-reserved-slots/',
+                    data: { date: date },
+                    success: function(data) {
+                        generateTimeSlots(date, data.reserved_slots);
+                    }
+                });
+            }
+
+            function generateTimeSlots(selectedDate, reservedSlots) {
+                var startTime = moment(selectedDate + ' 00:00', 'YYYYMMDD HH:mm');
+                var endTime = moment(selectedDate + ' 23:30', 'YYYYMMDD HH:mm');
                 var slotsHtml = ['', '', '']; // Array to hold HTML for each column
 
                 var slotIndex = 0;
                 while(startTime <= endTime) {
-                    slotsHtml[slotIndex % 3] += '<div class="time-slot" data-time="' + startTime.format('YYYYMMDDHHmm') + '">' +
+                    var slotTime = startTime.format('YYYYMMDDHHmm');
+                    var isReserved = reservedSlots.includes(slotTime);
+                    var slotClass = isReserved ? 'time-slot reserved' : 'time-slot';
+                    slotsHtml[slotIndex % 3] += '<div class="' + slotClass + '" data-time="' + slotTime + '">' +
                                                 startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') +
                                                 '</div>';
                     slotIndex++;
@@ -79,10 +99,11 @@
                 var columns = slotsHtml.map(html => '<div class="time-slot-column">' + html + '</div>');
                 $('#time-slots').html(columns.join(''));
 
-                $('.time-slot').on('click', function() {
+                $('.time-slot:not(.reserved)').on('click', function() {
                     if(confirm('¿Desea reservar este slot?')) {
                         var slotTime = $(this).data('time');
                         console.log('Reservando slot para: ', slotTime);
+                        // Implementar reserva aquí
                     }
                 });
             }
