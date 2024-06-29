@@ -3,25 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenplanner - Información del Usuario</title>
-    {% load static %}
+    <title>Información del Usuario</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="icon" href="{% static 'images/ZenPlanner_favicon.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Información del Usuario</h1>
-    </header>
-    <nav>
-        <a href="/">Inicio</a>
-    </nav>
     <div class="container">
-        <h2>Detalles del Usuario</h2>
+        <h1>Información del Usuario</h1>
         <p>Nombre: {{ user_info.name }}</p>
         <p>Email: {{ user_info.email }}</p>
+        <h2>Horarios Disponibles</h2>
+        <input type="text" id="daterange" class="form-control" />
+        <div id="time-slots"></div>
+        <script>
+            $(function() {
+                $('#daterange').daterangepicker({
+                    singleDatePicker: true,
+                    locale: { format: 'YYYY-MM-DD' },
+                    minDate: moment(),
+                    isInvalidDate: function(date) {
+                        // Define días no seleccionables si es necesario
+                    }
+                });
+
+                $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+                    generateTimeSlots(picker.startDate.format('YYYY-MM-DD'));
+                });
+
+                function generateTimeSlots(selectedDate) {
+                    var startTime = moment(selectedDate + ' 00:00', 'YYYY-MM-DD HH:mm');
+                    var endTime = moment(selectedDate + ' 23:30', 'YYYY-MM-DD HH:mm');
+                    var slotsHtml = '';
+                    
+                    while(startTime <= endTime) {
+                        slotsHtml += '<div class="time-slot" data-time="' + startTime.format('YYYYMMDDHHmm') + '">' +
+                                     startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') +
+                                     '</div>';
+                    }
+                    
+                    $('#time-slots').html(slotsHtml);
+
+                    $('.time-slot').on('click', function() {
+                        if(confirm('¿Desea reservar este slot?')) {
+                            // Lógica para guardar en la base de datos
+                            var slotTime = $(this).data('time');
+                            console.log('Reservando slot para: ', slotTime);
+                            // Redirección o actualización de página
+                        }
+                    });
+                }
+            });
+        </script>
     </div>
-    <footer>
-        <p>&copy; 2024 Zenplanner. Todos los derechos reservados.</p>
-    </footer>
 </body>
 </html>
