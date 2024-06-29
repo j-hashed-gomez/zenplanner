@@ -5,3 +5,4 @@ google-auth-oauthlib
 google-auth-httplib2
 mysqlclient>=2.0
 mod_wsgi
+social-auth-app-django
