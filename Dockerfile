@@ -84,3 +84,4 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Comando para ejecutar Apache en primer plano
 CMD ["apache2-foreground"]
+
