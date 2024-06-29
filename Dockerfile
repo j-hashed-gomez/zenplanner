@@ -67,7 +67,7 @@ COPY __init__.py /app/zenplanner/accounts/
 COPY templates/ /app/zenplanner/templates/
 
 # Copiar el contenido del directorio static a /app/zenplanner/static/
-COPY static/ /app/static/
+COPY static/ /app/zenplanner/static/
 
 # Copiar la configuración de Apache
 COPY mysite.conf /etc/apache2/sites-available/000-default.conf
