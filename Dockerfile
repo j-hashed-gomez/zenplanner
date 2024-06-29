@@ -47,7 +47,7 @@ RUN a2enmod wsgi
 # Crear los directorios necesarios para el proyecto y logs
 RUN mkdir -p /app/zenplanner/accounts \
     && mkdir -p /app/zenplanner/templates \
-    && mkdir -p /app/zenplanner/static \
+    && mkdir -p /app/zenplanner/static/css/ \
     && mkdir -p /app/logs
 
 # Copiar los archivos del proyecto al directorio de trabajo

@@ -1,14 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Login</title>
+    <title>Zenplanner - Inicio</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <h1>Welcome to the App</h1>
-    <a href="{% url 'google_login' %}">
-        <button>Login with Google</button>
-    </a>
+    <header>
+        <h1>Bienvenido a Zenplanner</h1>
+    </header>
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/user_info">Información del Usuario</a>
+    </nav>
+    <div class="container">
+        <h2>Página de Inicio</h2>
+        <p>Esta es la página de inicio de Zenplanner.</p>
+    </div>
+    <footer>
+        <p>&copy; 2024 Zenplanner. Todos los derechos reservados.</p>
+    </footer>
 </body>
 </html>
