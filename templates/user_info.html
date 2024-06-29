@@ -10,6 +10,32 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <style>
+        #calendar {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .time-slots-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .time-slot-column {
+            width: 32%;
+            margin: 5px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        .time-slot {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .time-slot:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,13 +43,13 @@
         <p>Nombre: {{ user_info.name }}</p>
         <p>Email: {{ user_info.email }}</p>
         <div id='calendar'></div>
+        <div class="time-slots-container" id="time-slots"></div>
     </div>
 
     <script>
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 defaultView: 'month',
-                events: '/api/get-reserved-slots/', // Asegúrate de que esta ruta está definida en urls.py y devuelve los datos correctos
                 height: 'auto',
                 header: {
                     left: 'prev,next today',
@@ -32,6 +58,31 @@
                 },
                 eventColor: '#378006'
             });
+
+            generateTimeSlots(moment().format('YYYY-MM-DD')); // Generate slots for today on initial load
+
+            function generateTimeSlots(date) {
+                var startTime = moment(date + ' 00:00', 'YYYY-MM-DD HH:mm');
+                var endTime = moment(date + ' 23:30', 'YYYY-MM-DD HH:mm');
+                var slotsHtml = ['', '', '']; // Array to hold HTML for each column
+                var slotIndex = 0;
+
+                while(startTime <= endTime) {
+                    var slotTime = startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm');
+                    slotsHtml[slotIndex % 3] += '<div class="time-slot">' + slotTime + '</div>';
+                    slotIndex++;
+                }
+
+                for (var i = 0; i < 3; i++) {
+                    $('#time-slots').append('<div class="time-slot-column">' + slotsHtml[i] + '</div>');
+                }
+
+                $('.time-slot').on('click', function() {
+                    var timeSlot = $(this).text();
+                    alert('Reservar slot para: ' + timeSlot);
+                    // Aquí puedes añadir la lógica para reservar el slot
+                });
+            }
         });
     </script>
 </body>
