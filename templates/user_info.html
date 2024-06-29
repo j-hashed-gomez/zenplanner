@@ -35,6 +35,11 @@
         .time-slot:last-child {
             border-bottom: none;
         }
+        .time-slot.reserved {
+            background-color: red;
+            color: white;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -56,33 +61,63 @@
                     center: 'title',
                     right: 'month,agendaWeek,agendaDay'
                 },
-                eventColor: '#378006'
+                eventColor: '#378006',
+                dayClick: function(date) {
+                    generateTimeSlots(date.format('YYYY-MM-DD'));
+                }
             });
 
-            generateTimeSlots(moment().format('YYYY-MM-DD')); // Generate slots for today on initial load
-
             function generateTimeSlots(date) {
-                var startTime = moment(date + ' 00:00', 'YYYY-MM-DD HH:mm');
-                var endTime = moment(date + ' 23:30', 'YYYY-MM-DD HH:mm');
-                var slotsHtml = ['', '', '']; // Array to hold HTML for each column
-                var slotIndex = 0;
+                $('#time-slots').empty();
+                $.ajax({
+                    url: '/api/get-reserved-slots/',
+                    data: { date: date },
+                    success: function(data) {
+                        var reservedSlots = data.reserved_slots;
+                        var startTime = moment(date + ' 00:00', 'YYYY-MM-DD HH:mm');
+                        var endTime = moment(date + ' 23:30', 'YYYY-MM-DD HH:mm');
+                        var slotsHtml = ['', '', ''];
+                        var slotIndex = 0;
 
-                while(startTime <= endTime) {
-                    var slotTime = startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm');
-                    slotsHtml[slotIndex % 3] += '<div class="time-slot">' + slotTime + '</div>';
-                    slotIndex++;
-                }
+                        while (startTime <= endTime) {
+                            var slotTime = startTime.format('YYYYMMDDHHmm');
+                            var isReserved = reservedSlots.includes(slotTime);
+                            var slotClass = isReserved ? 'time-slot reserved' : 'time-slot';
+                            slotsHtml[slotIndex % 3] += '<div class="' + slotClass + '" data-time="' + slotTime + '">' + startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') + '</div>';
+                            slotIndex++;
+                        }
 
-                for (var i = 0; i < 3; i++) {
-                    $('#time-slots').append('<div class="time-slot-column">' + slotsHtml[i] + '</div>');
-                }
+                        for (var i = 0; i < 3; i++) {
+                            $('#time-slots').append('<div class="time-slot-column">' + slotsHtml[i] + '</div>');
+                        }
 
-                $('.time-slot').on('click', function() {
-                    var timeSlot = $(this).text();
-                    alert('Reservar slot para: ' + timeSlot);
-                    // Aquí puedes añadir la lógica para reservar el slot
+                        $('.time-slot:not(.reserved)').on('click', function() {
+                            var slotTime = $(this).data('time');
+                            if (confirm('¿Desea reservar este slot para ' + slotTime + '?')) {
+                                $.ajax({
+                                    url: '/reserve-slot/',
+                                    type: 'POST',
+                                    data: {
+                                        'slot_time': slotTime,
+                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                    },
+                                    success: function(response) {
+                                        alert(response.message);
+                                        if (response.status === 'success') {
+                                            $(this).addClass('reserved').css('background-color', 'red').off('click');
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        alert('Error al reservar el slot: ' + xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
             }
+
+            generateTimeSlots(moment().format('YYYY-MM-DD')); // Genera slots para hoy en la carga inicial
         });
     </script>
 </body>
