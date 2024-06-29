@@ -2,12 +2,10 @@ import os
 import requests
 import logging
 from django.shortcuts import redirect, render
-from django.utils import timezone
-from django.db import connections
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-from .models import UserInfo  # Asegúrate de tener este modelo definido
+from .models import UserInfo  # Asegúrate de tener este modelo definido en models.py
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +38,6 @@ def google_callback(request):
         'grant_type': 'authorization_code'
     }
     token_response = requests.post(token_url, data=token_data)
-    logger.debug(f"Token response status: {token_response.status_code}, body: {token_response.text}")
     if token_response.status_code != 200:
         logger.error(f"Failed to obtain access token: {token_response.text}")
         return HttpResponse("Error: Failed to obtain access token", status=token_response.status_code)
@@ -48,7 +45,6 @@ def google_callback(request):
     token_json = token_response.json()
     access_token = token_json.get('access_token')
     if not access_token:
-        logger.error("No access token returned")
         return HttpResponseBadRequest("Error: No access token returned")
 
     userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
@@ -60,20 +56,15 @@ def google_callback(request):
 
     user, created = User.objects.get_or_create(username=email, defaults={'first_name': realname})
     if created:
-        logger.info(f"Created new user: {email}")
-        user.set_password('oauth_password')
+        user.set_password('oauth_password')  # Set a fixed password
         user.save()
 
-    logger.debug(f"Authenticating user: {email}")
     user = authenticate(request, username=email, password='oauth_password')
     if user is not None:
         login(request, user)
         response = render(request, 'user_info.html', {'user_info': {'name': realname, 'email': email}})
-        response.set_cookie('sessionid', request.session.session_key, httponly=True, secure=True)
-        logger.info(f"User authenticated and session created: {email}")
         return response
     else:
-        logger.error(f"Authentication failed for user: {email}")
         return HttpResponse("Authentication failed", status=401)
 
 def logout_view(request):
@@ -81,14 +72,14 @@ def logout_view(request):
     return redirect('index')
 
 def get_reserved_slots(request):
-    if request.method == 'GET':
-        selected_date = request.GET.get('date')
-        if selected_date:
-            reserved_slots = UserInfo.objects.filter(timestamp__startswith=selected_date).values_list('timestamp', flat=True)
-            return JsonResponse({'reserved_slots': list(reserved_slots)})
-        else:
-            return JsonResponse({'error': 'Fecha no especificada'}, status=400)
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+    # Ejemplo básico, asume que tienes un modelo que representa los eventos
+    events = UserInfo.objects.filter(email=request.user.email).values('id', 'timestamp', 'info')  # Ajustar según el modelo real
+    event_data = [{
+        'title': event['info'], 
+        'start': event['timestamp'],
+        'end': event['timestamp']  # Asumiendo que start y end son iguales, ajustar según necesidades
+    } for event in events]
+    return JsonResponse(event_data, safe=False)
 
 def reserve_slot(request):
     if request.method == 'POST':

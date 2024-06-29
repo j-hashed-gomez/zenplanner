@@ -6,107 +6,25 @@
     <title>Información del Usuario</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <style>
-        .month-selected {
-            font-size: 2em;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .time-slots-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        .time-slot-column {
-            width: 32%;
-            background-color: #f0f0f0;
-            margin: 5px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-        .time-slot {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-        }
-        .time-slot:last-child {
-            border-bottom: none;
-        }
-        .time-slot.reserved {
-            background-color: red;
-            color: white;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-    </style>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
 </head>
 <body>
     <div class="container">
         <h1>Información del Usuario</h1>
         <p>Nombre: {{ user_info.name }}</p>
         <p>Email: {{ user_info.email }}</p>
-        <h2>Horarios Disponibles</h2>
-        <input type="text" id="daterange" class="form-control">
-        <div id="selected-month" class="month-selected">Mes seleccionado: Ninguno</div>
-        <div id="time-slots" class="time-slots-container"></div>
+        <div id='calendar'></div>
     </div>
 
     <script>
-        $(function() {
-            $('#daterange').daterangepicker({
-                singleDatePicker: true,
-                locale: { format: 'YYYY-MM-DD' },
-                minDate: moment(),
-                isInvalidDate: function(date) {}
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                defaultView: 'month',
+                events: '/api/get-reserved-slots/',
+                // additional FullCalendar options
             });
-
-            $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-                $('#selected-month').text('Mes seleccionado: ' + picker.startDate.format('MMMM YYYY'));
-                var selectedDate = picker.startDate.format('YYYYMMDD');
-                fetchReservedSlots(selectedDate);
-            });
-
-            function fetchReservedSlots(date) {
-                $.ajax({
-                    url: '/api/get-reserved-slots/',
-                    data: { date: date },
-                    success: function(data) {
-                        generateTimeSlots(date, data.reserved_slots);
-                    }
-                });
-            }
-
-            function generateTimeSlots(selectedDate, reservedSlots) {
-                var startTime = moment(selectedDate + ' 00:00', 'YYYYMMDD HH:mm');
-                var endTime = moment(selectedDate + ' 23:30', 'YYYYMMDD HH:mm');
-                var slotsHtml = ['', '', '']; // Array to hold HTML for each column
-
-                var slotIndex = 0;
-                while(startTime <= endTime) {
-                    var slotTime = startTime.format('YYYYMMDDHHmm');
-                    var isReserved = reservedSlots.includes(slotTime);
-                    var slotClass = isReserved ? 'time-slot reserved' : 'time-slot';
-                    slotsHtml[slotIndex % 3] += '<div class="' + slotClass + '" data-time="' + slotTime + '">' +
-                                                startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') +
-                                                '</div>';
-                    slotIndex++;
-                }
-
-                var columns = slotsHtml.map(html => '<div class="time-slot-column">' + html + '</div>');
-                $('#time-slots').html(columns.join(''));
-
-                $('.time-slot:not(.reserved)').on('click', function() {
-                    if(confirm('¿Desea reservar este slot?')) {
-                        var slotTime = $(this).data('time');
-                        console.log('Reservando slot para: ', slotTime);
-                        // Implementar reserva aquí
-                    }
-                });
-            }
         });
     </script>
 </body>
