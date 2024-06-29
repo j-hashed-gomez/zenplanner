@@ -10,6 +10,33 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <style>
+        .month-selected {
+            font-size: 2em;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .time-slots-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .time-slot-column {
+            width: 32%;
+            background-color: #f0f0f0;
+            margin: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .time-slot {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .time-slot:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,47 +44,49 @@
         <p>Nombre: {{ user_info.name }}</p>
         <p>Email: {{ user_info.email }}</p>
         <h2>Horarios Disponibles</h2>
-        <input type="text" id="daterange" class="form-control" />
-        <div id="time-slots"></div>
-        <script>
-            $(function() {
-                $('#daterange').daterangepicker({
-                    singleDatePicker: true,
-                    locale: { format: 'YYYY-MM-DD' },
-                    minDate: moment(),
-                    isInvalidDate: function(date) {
-                        // Define días no seleccionables si es necesario
-                    }
-                });
-
-                $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-                    generateTimeSlots(picker.startDate.format('YYYY-MM-DD'));
-                });
-
-                function generateTimeSlots(selectedDate) {
-                    var startTime = moment(selectedDate + ' 00:00', 'YYYY-MM-DD HH:mm');
-                    var endTime = moment(selectedDate + ' 23:30', 'YYYY-MM-DD HH:mm');
-                    var slotsHtml = '';
-                    
-                    while(startTime <= endTime) {
-                        slotsHtml += '<div class="time-slot" data-time="' + startTime.format('YYYYMMDDHHmm') + '">' +
-                                     startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') +
-                                     '</div>';
-                    }
-                    
-                    $('#time-slots').html(slotsHtml);
-
-                    $('.time-slot').on('click', function() {
-                        if(confirm('¿Desea reservar este slot?')) {
-                            // Lógica para guardar en la base de datos
-                            var slotTime = $(this).data('time');
-                            console.log('Reservando slot para: ', slotTime);
-                            // Redirección o actualización de página
-                        }
-                    });
-                }
-            });
-        </script>
+        <input type="text" id="daterange" class="form-control">
+        <div id="selected-month" class="month-selected">Mes seleccionado: Ninguno</div>
+        <div id="time-slots" class="time-slots-container"></div>
     </div>
+
+    <script>
+        $(function() {
+            $('#daterange').daterangepicker({
+                singleDatePicker: true,
+                locale: { format: 'YYYY-MM-DD' },
+                minDate: moment(),
+                isInvalidDate: function(date) {}
+            });
+
+            $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+                $('#selected-month').text('Mes seleccionado: ' + picker.startDate.format('MMMM YYYY'));
+                generateTimeSlots(picker.startDate.format('YYYY-MM-DD'));
+            });
+
+            function generateTimeSlots(selectedDate) {
+                var startTime = moment(selectedDate + ' 00:00', 'YYYY-MM-DD HH:mm');
+                var endTime = moment(selectedDate + ' 23:30', 'YYYY-MM-DD HH:mm');
+                var slotsHtml = ['', '', '']; // Array to hold HTML for each column
+
+                var slotIndex = 0;
+                while(startTime <= endTime) {
+                    slotsHtml[slotIndex % 3] += '<div class="time-slot" data-time="' + startTime.format('YYYYMMDDHHmm') + '">' +
+                                                startTime.format('HH:mm') + ' - ' + startTime.add(30, 'minutes').format('HH:mm') +
+                                                '</div>';
+                    slotIndex++;
+                }
+
+                var columns = slotsHtml.map(html => '<div class="time-slot-column">' + html + '</div>');
+                $('#time-slots').html(columns.join(''));
+
+                $('.time-slot').on('click', function() {
+                    if(confirm('¿Desea reservar este slot?')) {
+                        var slotTime = $(this).data('time');
+                        console.log('Reservando slot para: ', slotTime);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
