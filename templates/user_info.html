@@ -7,8 +7,9 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,8 +23,14 @@
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 defaultView: 'month',
-                events: '/api/get-reserved-slots/',
-                // additional FullCalendar options
+                events: '/api/get-reserved-slots/', // Asegúrate de que esta ruta está definida en urls.py y devuelve los datos correctos
+                height: 'auto',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                eventColor: '#378006'
             });
         });
     </script>

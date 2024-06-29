@@ -13,6 +13,32 @@ GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI')
 
+from django.shortcuts import redirect, render
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from .models import UserInfo  # Asegúrate de tener este modelo definido en models.py
+
+# Las importaciones y otras funciones se mantienen igual que en la versión anterior
+
+def reserve_slot(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        email = request.POST.get('email')
+        timestamp = request.POST.get('timestamp')
+        
+        if request.user.is_authenticated and request.user.email == email:
+            new_reservation = UserInfo(user_id=user_id, email=email, timestamp=timestamp)
+            new_reservation.save()
+            return JsonResponse({'status': 'success', 'message': 'Slot reservado con éxito.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'No autenticado o email no coincide.'}, status=403)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+# Incluye esta función en el mismo archivo views.py donde están las otras funciones
+
+
+
 def index(request):
     return render(request, 'index.html')
 
@@ -72,25 +98,6 @@ def logout_view(request):
     return redirect('index')
 
 def get_reserved_slots(request):
-    # Ejemplo básico, asume que tienes un modelo que representa los eventos
-    events = UserInfo.objects.filter(email=request.user.email).values('id', 'timestamp', 'info')  # Ajustar según el modelo real
-    event_data = [{
-        'title': event['info'], 
-        'start': event['timestamp'],
-        'end': event['timestamp']  # Asumiendo que start y end son iguales, ajustar según necesidades
-    } for event in events]
+    events = UserInfo.objects.filter(email=request.user.email).values('timestamp', 'info')  # Asumiendo que el modelo tiene estos campos
+    event_data = [{'title': e['info'], 'start': e['timestamp'], 'end': e['timestamp']} for e in events]  # Ajusta según la estructura de tu modelo
     return JsonResponse(event_data, safe=False)
-
-def reserve_slot(request):
-    if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        email = request.POST.get('email')
-        timestamp = request.POST.get('timestamp')
-        
-        if request.user.is_authenticated and request.user.email == email:
-            new_reservation = UserInfo(user_id=user_id, email=email, timestamp=timestamp)
-            new_reservation.save()
-            return JsonResponse({'status': 'success', 'message': 'Slot reservado con éxito.'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'No autenticado o email no coincide.'}, status=403)
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)

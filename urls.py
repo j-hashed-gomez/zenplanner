@@ -7,5 +7,5 @@ urlpatterns = [
     path('callback/', google_callback, name='google_callback'),
     path('logout/', logout_view, name='logout'),
     path('api/get-reserved-slots/', get_reserved_slots, name='get_reserved_slots'),
-    path('reserve/', reserve_slot, name='reserve_slot'),
+    path('reserve/', reserve_slot, name='reserve_slot'),  # Añade esta línea
 ]
