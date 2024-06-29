@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Migraciones de Django
+/app/venv/bin/python /app/manage.py makemigrations --noinput
 /app/venv/bin/python /app/manage.py migrate --noinput
 
 # Recoger archivos estáticos

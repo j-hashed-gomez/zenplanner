@@ -54,6 +54,7 @@ RUN mkdir -p /app/zenplanner/accounts \
 # Copiar los archivos del proyecto al directorio de trabajo
 COPY manage.py /app/
 COPY wsgi.py /app/zenplanner/
+COPY models.py /app/zenplanner/
 COPY urls.py /app/zenplanner/
 COPY settings.py /app/zenplanner/
 COPY views.py /app/zenplanner/
