@@ -6,7 +6,7 @@
     <title>Zenplanner - Información del Usuario</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="icon" href="{% static 'images/ZenPlanner_favicon.jpg' %}" type="image/jpeg">
+    <link rel="icon" href="{% static 'images/ZenPlanner_favicon.png' %}" type="image/png">
 </head>
 <body>
     <header>
@@ -14,11 +14,11 @@
     </header>
     <nav>
         <a href="/">Inicio</a>
-        <a href="/user_info">Información del Usuario</a>
     </nav>
     <div class="container">
         <h2>Detalles del Usuario</h2>
-        <p>Información detallada del usuario.</p>
+        <p>Nombre: {{ user_info.name }}</p>
+        <p>Email: {{ user_info.email }}</p>
     </div>
     <footer>
         <p>&copy; 2024 Zenplanner. Todos los derechos reservados.</p>
