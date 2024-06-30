@@ -6,6 +6,6 @@ urlpatterns = [
     path('google-login/', google_login, name='google_login'),
     path('callback/', google_callback, name='google_callback'),
     path('logout/', logout_view, name='logout'),
-    path('api/get-reserved-slots/', get_reserved_slots), 
+    path('reserve-slot/', reserve_slot, name='reserve_slot'),
     path('api/get-reserved-slots/', get_reserved_slots, name='get_reserved_slots'),
 ]
